@@ -1,1 +1,87 @@
+#include <iostream>;
+#include <vector>
+using namespace std;
 
+// Интерфейс команды
+class ICommand {
+public:
+virtual void execute() = 0;
+};
+
+// Кондиционер
+class Conditioner {
+private:
+int t; // температура
+public:
+void on() {
+cout << "Кондиционер включен" << endl;
+}
+
+void off() {
+cout << "Кондиционер выключен" << endl;
+}
+};
+
+// Команда для отключения кондиционера
+class ConditionerOffCommand : public ICommand {
+private:
+Conditioner* _conditioner;
+public:
+ConditionerOffCommand(Conditioner* conditioner) : _conditioner(conditioner) {}
+
+virtual void execute() override {
+_conditioner->off();
+}
+};
+// Команды при включениии кондиционера
+class ConditionerOnCommand : public ICommand {
+private:
+Conditioner* _conditioner;
+public:
+ConditionerOnCommand(Conditioner* conditioner) : _conditioner(conditioner) {}
+
+virtual void execute() override {
+_conditioner->on();
+}
+};
+
+// Класс, вызывающий команды (пульт)
+class RemoteControl {
+private:
+vector<ICommand*> _commands;
+public:
+void set_command(vector<ICommand*> commands) {
+_commands = commands;
+}
+
+void button1() {
+_commands.at(0)->execute();
+}
+
+void button2() {
+_commands.at(1)->execute();
+}
+};
+
+void client_request() {
+// Создаем пульт для управления командами
+RemoteControl* remote_control = new RemoteControl();
+
+// Создаем объект для взаимодейтсвия
+Conditioner* conditioner = new Conditioner();
+
+// Создаем и приводим в действие имеющиеся команды
+vector<ICommand*> commands;
+commands.push_back(new ConditionerOnCommand(conditioner));
+commands.push_back(new ConditionerOffCommand(conditioner));
+
+remote_control->set_command(commands);
+remote_control->button1();
+remote_control->button2();
+}
+
+int main() {
+setlocale(LC_ALL, "rus");
+client_request();
+return 0;
+}
